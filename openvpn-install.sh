@@ -218,9 +218,9 @@ if [[ ! -e /etc/openvpn/server/server.conf ]]; then
 	read -n1 -r -p "Press any key to continue..."
 	# If running inside a container, disable LimitNPROC to prevent conflicts
 	if systemd-detect-virt -cq; then
-		mkdir /etc/systemd/system/openvpn-server@server.service.d/ 2>/dev/null
+		mkdir /etc/systemd/system/openvpn-server-udp@server.service.d/ 2>/dev/null
 		echo "[Service]
-LimitNPROC=infinity" > /etc/systemd/system/openvpn-server@server.service.d/disable-limitnproc.conf
+LimitNPROC=infinity" > /etc/systemd/system/openvpn-server-udp@server.service.d/disable-limitnproc.conf
 	fi
 	if [[ "$os" = "debian" || "$os" = "ubuntu" ]]; then
 		apt-get update
@@ -420,7 +420,7 @@ auth SHA512
 ignore-unknown-option block-outside-dns
 verb 3" > /etc/openvpn/server/client-common.txt
 	# Enable and start the OpenVPN service
-	systemctl enable --now openvpn-server@server.service
+	systemctl enable --now openvpn-server-udp@server.service
 	# Generates the custom client.ovpn
 	new_client
 	echo
@@ -534,8 +534,8 @@ else
 				if sestatus 2>/dev/null | grep "Current mode" | grep -q "enforcing" && [[ "$port" != 1194 ]]; then
 					semanage port -d -t openvpn_port_t -p "$protocol" "$port"
 				fi
-				systemctl disable --now openvpn-server@server.service
-				rm -f /etc/systemd/system/openvpn-server@server.service.d/disable-limitnproc.conf
+				systemctl disable --now openvpn-server-udp@server.service
+				rm -f /etc/systemd/system/openvpn-server-udp@server.service.d/disable-limitnproc.conf
 				rm -f /etc/sysctl.d/99-openvpn-forward.conf
 				if [[ "$os" = "debian" || "$os" = "ubuntu" ]]; then
 					rm -rf /etc/openvpn/server
